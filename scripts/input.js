@@ -34,9 +34,15 @@ window.addEventListener('keyup', function(e){
     }
 });
 
+function handleKeyDown(event) {
+    console.log('按下了键：', event.key);
+    // 根据按下的键执行操作
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const playButton = document.getElementById('playButton');
     const backgroundMusic = document.getElementById('backgroundMusic');
+    const startButton = document.getElementById('startButton');
 
     playButton.addEventListener('click', function() {
         if (backgroundMusic.paused) {
@@ -47,4 +53,26 @@ document.addEventListener('DOMContentLoaded', function() {
             playButton.textContent = 'Play Music'; 
         }
     });
+    startButton.addEventListener('click', function() {
+        if (!isGameRunning) {
+            startGame();
+            startButton.textContent = 'Stop Game';
+            isGameRunning = true; 
+        } else {
+            stopGame(); 
+            startButton.textContent = 'Start Game';
+            isGameRunning = false; 
+        }
+    });
 });
+
+
+function startGame() {
+    animate();
+}
+
+function stopGame() {
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+}

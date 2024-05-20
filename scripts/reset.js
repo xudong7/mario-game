@@ -8,5 +8,5 @@ function resetGame() {
 
     score = 0;
 
-    requestAnimationFrame(animate);
+    startGame();
 }

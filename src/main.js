@@ -23,6 +23,8 @@ const coin_height = 10;
 const monster_width = 211;
 const monster_height = 238;
 let score = 0;
+let isGameRunning = false;
+let animationFrameId;
 ctx.font = '10px consolas';
 
 const man = new Man();
@@ -41,9 +43,9 @@ function animate(){
         coin.y = Math.random() * (CANVAS_HEIGHT - 20);
     }
     drawScore();
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
 }
-animate();
+
 
 
 

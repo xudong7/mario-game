@@ -9,6 +9,10 @@ class Monster{
         this.vy = 0; // 新增垂直速度
         this.image = new Image();
         this.image.src = monster_src;
+        this.frame = 0;
+        this.maxFrame = 4;
+        this.frameTimer = 0;
+        this.frameInterval = 800;
         this.move();
     }
     draw(){
@@ -16,23 +20,36 @@ class Monster{
     }
     move(){
         requestAnimationFrame(this.move.bind(this));
-        // 随机改变方向
-        if (Math.random() < 0.05) { // 调整这个概率来控制方向改变的频率
-            const directions = [
-                {vx: 0, vy: -0.3}, // 上
-                {vx: 0, vy: 0.3},  // 下
-                {vx: -0.3, vy: 0}, // 左
-                {vx: 0.3, vy: 0}   // 右
-            ];
-            const choice = directions[Math.floor(Math.random() * directions.length)];
-            this.vx = choice.vx;
-            this.vy = choice.vy;
+        this.frameTimer += 8;
+
+        if (this.x < 0 || this.x > CANVAS_WIDTH - this.width) {
+            this.vx *= -1;
         }
-        // 更新位置
+        if (this.y < 0 || this.y > CANVAS_HEIGHT - this.height) {
+            this.vy *= -1;
+        }
+        
+        const directions = [
+            {vx: 0.2, vy: -0.4}, 
+            {vx: -0.2, vy: 0.4},  
+            {vx: -0.4, vy: 0.2}, 
+            {vx: 0.4, vy: -0.2}   
+        ];
+        if (this.frameTimer > this.frameInterval) {
+            this.frameTimer = 0; 
+            if (this.frame < this.maxFrame) {
+                const choice = directions[Math.floor(Math.random() * directions.length)];
+                this.vx = choice.vx;
+                this.vy = choice.vy;
+                this.frame++;
+            }
+            else {
+                this.frame = 0;
+                this.vx = 0;
+                this.vy = 0;
+            }
+        }
         this.x += this.vx;
         this.y += this.vy;
-        // 确保不会移出画布
-        this.x = Math.max(0, Math.min(CANVAS_WIDTH - this.width, this.x));
-        this.y = Math.max(0, Math.min(CANVAS_HEIGHT - this.height, this.y));
     }
 }
