@@ -6,6 +6,24 @@ CANVAS_HEIGHT = canvas.height = 182;
 
 const red_src = 'red_man.png';
 const green_src = 'green_man.png';
+const walk_src = 'stay.jpg';
+const run_src = 'walk.jpg';
+const coin_src = 'coin.png';
+const monster_src = 'monster2.png';
+
+const red_width = 24;
+const red_height = 23;
+const green_width = 26;
+const green_height = 28;
+const walk_width = 484;
+const walk_height = 726;
+const run_width = 547;
+const run_height = 865;
+const coin_width = 10;
+const coin_height = 10;
+const monster_width = 211;
+const monster_height = 238;
+
 let score = 0;
 ctx.font = '10px consolas';
 
@@ -14,11 +32,9 @@ class Man{
     constructor(){
         this.x = 24;
         this.y = 24;
-        this.vx = 0; 
-        this.vy = 0;
         this.ratio = 1.5;
-        this.width = 24 / this.ratio;
-        this.height = 23 / this.ratio;
+        this.width = red_width / this.ratio;
+        this.height = red_height / this.ratio;
         this.image = new Image();
         this.image.src = red_src;
         this.speed = 2;
@@ -29,16 +45,17 @@ class Man{
     changeImage(){
         if(this.image.src.includes(red_src)){
             this.image.src = green_src;
-            this.width = 26 / this.ratio;
-            this.height = 28 / this.ratio;
+            this.width = green_width / this.ratio;
+            this.height = green_height / this.ratio;
         }
         else{
             this.image.src = red_src;
-            this.width = 24 / this.ratio;
-            this.height = 23 / this.ratio;
+            this.width = red_width / this.ratio;
+            this.height = red_height / this.ratio;
         }
     }
     move(movement){
+        requestAnimationFrame(this.move.bind(this));
         switch(movement){
             case 'up':
                 this.y -= this.speed;
@@ -53,6 +70,8 @@ class Man{
                 this.x += this.speed;
                 break;
         }
+        this.x = Math.max(0, Math.min(CANVAS_WIDTH - this.width, this.x));
+        this.y = Math.max(0, Math.min(CANVAS_HEIGHT - this.height, this.y));
     }
 }
 
@@ -60,63 +79,28 @@ class Coin{
     constructor(){
         this.x = Math.random() * (CANVAS_WIDTH - 10);
         this.y = Math.random() * (CANVAS_HEIGHT - 10);
-        this.width = 10;
-        this.height = 10;
+        this.width = coin_width;
+        this.height = coin_height;
         this.image = new Image();
-        this.image.src = 'coin.png';
+        this.image.src = coin_src;
     }
     draw(){
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
 
-// class Monster{
-//     constructor(){
-//         this.x = Math.random() * (CANVAS_WIDTH - 10);
-//         this.y = Math.random() * (CANVAS_HEIGHT - 10);
-//         this.width = 15;
-//         this.height = 15;
-//         this.image = new Image();
-//         this.image.src = 'monster2.png';
-//         this.move();
-//     }
-//     draw(){
-//         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-//     }
-//     move(){
-//         setInterval(() => {
-//             const directions = ['up', 'down', 'left', 'right'];
-//             const choice = directions[Math.floor(Math.random() * directions.length)];
-//             switch(choice) {
-//                 case 'up':
-//                     this.y -= 10; 
-//                     break;
-//                 case 'down':
-//                     this.y += 10;
-//                     break;
-//                 case 'left':
-//                     this.x -= 10;
-//                     break;
-//                 case 'right':
-//                     this.x += 10;
-//                     break;
-//             }
-//             this.x = Math.max(0, Math.min(CANVAS_WIDTH - this.width, this.x));
-//             this.y = Math.max(0, Math.min(CANVAS_HEIGHT - this.height, this.y));
-//         }, 500); 
-//     }
-// }
 
 class Monster{
     constructor(){
         this.x = Math.random() * (CANVAS_WIDTH - 10);
         this.y = Math.random() * (CANVAS_HEIGHT - 10);
-        this.width = 15;
-        this.height = 15;
+        this.ratio = 15;
+        this.width = monster_width / this.ratio;
+        this.height = monster_height / this.ratio;
         this.vx = 0; // 新增水平速度
         this.vy = 0; // 新增垂直速度
         this.image = new Image();
-        this.image.src = 'monster2.png';
+        this.image.src = monster_src;
         this.move();
     }
     draw(){
@@ -144,8 +128,6 @@ class Monster{
         this.y = Math.max(0, Math.min(CANVAS_HEIGHT - this.height, this.y));
     }
 }
-
-
 
 window.addEventListener('keydown', function(e){
     switch(e.key){
@@ -206,13 +188,15 @@ function drawScore() {
 }
 
 function checkCollision(obj1, obj2) {
-    judge = obj1.x < obj2.x + obj2.width &&
+    let judge = obj1.x < obj2.x + obj2.width &&
     obj1.x + obj1.width > obj2.x &&
     obj1.y < obj2.y + coin.height &&
     obj1.y + obj1.height > obj2.y;
     if(judge === true && obj2 instanceof Monster){
-        alert('Game Over');
-        resetGame();
+        let restart = confirm(`Game Over! Your score is ${score}. Do you want to restart the game?`);
+        if (restart) {
+            resetGame();
+        }
     }
     else if(judge === true && obj2 instanceof Coin){
         return true;
